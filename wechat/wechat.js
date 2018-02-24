@@ -10,7 +10,8 @@ const accessTokenPath = path.join(__dirname,'..','config','access_token.txt')
 
 const prefix = 'https://api.weixin.qq.com/cgi-bin/'
 const api = {
-    accessToken:prefix + 'token?grant_type=client_credential'
+    accessToken:prefix + 'token?grant_type=client_credential',
+    chat:'http://api.qingyunke.com/api.php?key=free&appid=0'
 }
 
 function Wechat(config) {
@@ -94,4 +95,20 @@ Wechat.prototype.fetchAcessToken = function() {
     })
 }
 
+Wechat.prototype.chat = function(msg){
+    let uri = api.chat + `&msg=${encodeURI(msg)}`
+    return new Promise(function(resolve,reject){
+        let options = {
+            uri,
+            method:"GET"
+        }
+        rp(options).then(function(body){
+            let res = JSON.parse(body)
+            if(res.result===0) resolve(res.content)
+            else reject('聊天功能测试中')
+        }).catch(function(err){
+            reject("聊天功能测试中")
+        })
+    })
+}
 module.exports = Wechat 
