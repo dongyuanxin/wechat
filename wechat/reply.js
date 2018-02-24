@@ -38,9 +38,6 @@ let reply = async function(ctx,message){
             errCode = ''
         switch(message.Content) {
             case '文章':
-                data.content = '测试'
-                break
-            default:
                 data.msgType = 'news'
                 data.content = [
                     {
@@ -50,7 +47,13 @@ let reply = async function(ctx,message){
                         url:'https://github.com/godbmw'
                     }
                 ]
+                break
+            default:
+                data.content = await wechatApi.chat(message.Content)
         }
+    } else if (message.MsgType === 'voice') {
+        // console.log(message)
+        data.content = await wechatApi.chat(message.Recognition)
     }
     ctx.response.status = 200
     ctx.response.body = json2Xml(data)
