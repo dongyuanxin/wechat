@@ -75,8 +75,8 @@ Wechat.prototype.fetchAcessToken = function() {
             expires_in:this.expires_in
         })
     }
-    
-    this.getAccessToken().then(function(data){
+    // 注意：return Promise
+    return this.getAccessToken().then(function(data){
         try{
             data = JSON.parse(data)
         } catch(error) {
