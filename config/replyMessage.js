@@ -8,8 +8,7 @@ let help = `回复关键词如下( 去掉空格等字符 )：
 
 let more = `技术栈 : Vue + Node + Koa2 + MongoDB + MySql
 个人站点 : www.godbmw.com ( 搭建ing )
-自动聊天 : 青客云
-天气查询 : 和风天气`
+特别鸣谢 : 青云客 + 和风天气`
 
 let passages = [
     {
