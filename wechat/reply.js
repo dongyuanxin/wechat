@@ -2,7 +2,9 @@
 const {json2Xml} = require('./../utils/util')
 const config = require('./../config/wechat')
 const Wechat = require('./wechat')
+const Weather = require('./weather')
 const path = require('path')
+const replyMessage = require('./../config/replyMessage')
 
 const mediaPath = {
     image:path.join(__dirname,'..','static','test','image.jpg'),
@@ -10,6 +12,7 @@ const mediaPath = {
 }
 
 let wechatApi = new Wechat(config)
+let weather = new Weather()
 
 let reply = async function(ctx,message){
     let data = {}
@@ -17,7 +20,6 @@ let reply = async function(ctx,message){
     data.toUserName = message.FromUserName
     data.now = new Date().getTime()
     data.msgType = 'text' // 默认是text
-
     if(message.MsgType==='event') {
         if (message.Event==='subscribe') {
             data.content = '欢迎关注'
@@ -37,23 +39,23 @@ let reply = async function(ctx,message){
         let res ='',
             errCode = ''
         switch(message.Content) {
-            case '文章':
+            case '0':
+                data.content = replyMessage['0']
+                break
+            case '1':
                 data.msgType = 'news'
-                data.content = [
-                    {
-                        title:'(๑′ᴗ‵๑)Ｉ Lᵒᵛᵉᵧₒᵤ❤',
-                        description:'来自godbmw的问候',
-                        picurl:'https://avatars0.githubusercontent.com/u/26399528?s=460&v=4',
-                        url:'https://github.com/godbmw'
-                    }
-                ]
+                data.content = replyMessage['1']
                 break
             default:
                 data.content = await wechatApi.chat(message.Content)
         }
     } else if (message.MsgType === 'voice') {
-        // console.log(message)
         data.content = await wechatApi.chat(message.Recognition)
+    } else if(message.MsgType === 'location') {
+        let label = message.Label,
+            locX = message.Location_X,
+            locY = message.Location_Y
+        data.content = '地理位置 ' + label + '\n' + await weather.fetchNow(locY + ',' + locX)
     }
     ctx.response.status = 200
     ctx.response.body = json2Xml(data)
