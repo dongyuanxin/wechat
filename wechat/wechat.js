@@ -13,6 +13,7 @@ const api = {
     accessToken:prefix + 'token?grant_type=client_credential',
     chat:'http://api.qingyunke.com/api.php?key=free&appid=0'
 }
+const faceRe = /\{face.*?\}/gs // 过滤掉 青云客 平台的表情符号
 
 function Wechat(config) {
     this.appID = config.appID
@@ -104,11 +105,13 @@ Wechat.prototype.chat = function(msg){
         }
         rp(options).then(function(body){
             let res = JSON.parse(body)
-            if(res.result===0) resolve(res.content)
+            if(res.result===0) resolve(res.content.replace(faceRe,'') + ' ') // 不能发送空白消息
             else reject('聊天功能测试中')
         }).catch(function(err){
             reject("聊天功能测试中")
         })
     })
 }
+
+
 module.exports = Wechat 
