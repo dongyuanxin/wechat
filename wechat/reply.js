@@ -5,6 +5,7 @@ const Wechat = require('./wechat')
 const Weather = require('./weather')
 const path = require('path')
 const replyMessage = require('./../config/replyMessage')
+let mysql = require('./../db/mysql')
 
 const mediaPath = {
     image:path.join(__dirname,'..','static','test','image.jpg'),
@@ -45,6 +46,9 @@ let reply = async function(ctx,message){
             case '1':
                 data.msgType = 'news'
                 data.content = replyMessage['1']
+                break
+            case '数据库':
+                data.content = await wechatApi.sqlTest(mysql.db)
                 break
             default:
                 data.content = await wechatApi.chat(message.Content)

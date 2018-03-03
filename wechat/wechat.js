@@ -113,5 +113,15 @@ Wechat.prototype.chat = function(msg){
     })
 }
 
-
+Wechat.prototype.sqlTest = function(db){
+    var  sql = 'SELECT * FROM godbmw ';
+    return new Promise((resolve,reject)=>{
+        db.query(sql,function (err, result) {
+            if(err) reject('查看错误')
+            console.log(result);
+            console.log(result[0].Id)
+            resolve(result)
+        });  
+    })
+}
 module.exports = Wechat 
