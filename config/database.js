@@ -4,8 +4,7 @@ let mysql = {
     port : 3306,
     user : '',
     password : '',
-    database : '',
-    table: ''
+    database : ''
 }
 exports = moudle.exports = {
     mysql
