@@ -6,6 +6,6 @@ let mysql = {
     password : '',
     database : ''
 }
-exports = moudle.exports = {
+exports = module.exports = {
     mysql
 }
