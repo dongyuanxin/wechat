@@ -1,14 +1,14 @@
 'use strict'
-let help = `回复关键词如下( 去掉空格等字符 )：
-0 : 技术文档
-1 : 最新文章
-其他消息系统会开启自动聊天功能，支持文本和语音输入，不支持表情、图片和视频
+let help = `v1.0版本功能如下
+发送微信实时位置：返回 实时天气 数据
+发送'help'或'帮助'：返回 帮助文档
+发送'author'或'作者'：返回 开发者信息
+其他消息：默认开启智能聊天功能（支持语音和文字）
+<a href="https://github.com/godbmw/wechat/blob/master/README.md">>>> 查看更多使用说明</a>`
 
-更多内容请回复 1 来获取`
-
-let more = `技术栈 : Vue + Node + Koa2 + MongoDB + MySql
-个人站点 : www.godbmw.com ( 搭建ing )
-特别鸣谢 : 青云客 + 和风天气`
+let author = `微信：IT_xxx
+QQ：2181111110
+<a href="https://github.com/godbmw/">>>> Click to Follow Me</a>`
 
 let passages = [
     {
@@ -25,7 +25,7 @@ let passages = [
 ]
 
 module.exports = {
+    author,
     help,
-    0:more,
-    1:passages
+    passages
 }
