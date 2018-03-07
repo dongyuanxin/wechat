@@ -1,13 +1,28 @@
 'use strict'
 const sha1 = require('sha1')
 const Wechat = require('./wechat') 
+const DataBase = require('./database')
 const path = require('path')
 const {formatJson} = require(path.join(__dirname,'..','utils','util.js'))
 const {reply} = require('./reply')
-
+const {sleep} = require('./../utils/util')
 const config = require('../config/wechat')
+let interval = null
+let wechatApi = new Wechat(config) // 创建实例时，刷新票据
+let dbApi = new DataBase()
 
-let wechatApi = new Wechat(config)
+async function rollbackDB(){
+    let time = new Date()
+    let hour = time.getHours() , dateStr = time.toLocaleDateString() , timeStr = time.toLocaleTimeString()
+    console.log(`数据库回滚检查 ${dateStr}-${timeStr}`)
+    if(hour===1){ // 每日凌晨一点刷新
+        dbApi.rollbackTimes() 
+        clearInterval(interval) // 清空定时器
+        await sleep(1000 * 3600 + 1 ) // 更新后，等待1小时后再刷新
+        interval = setInterval( rollbackDB, 1000 * 3600) 
+    }
+}
+interval = setInterval( rollbackDB , 1000 * 3600) // 每20分钟检查一次 
 
 let accessWechat = async function(ctx,next) {
     let wechat = new Wechat(config)
