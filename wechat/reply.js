@@ -27,7 +27,7 @@ let reply = async function(ctx,message){
     data.msgType = 'text' // 默认是text
     if(message.MsgType==='event') {
         if (message.Event==='subscribe') {
-            data.content = '欢迎关注'
+            data.content = replyMessage.help
         } else if (message.Event ==='unsubscribe'){
             console.log("无情取关")
             return             
