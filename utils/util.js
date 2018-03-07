@@ -105,7 +105,14 @@ function json2Xml(data){
     return xml
 }
 
+function sleep(ms){
+    return new Promise(resolve=>{
+        setTimeout( ()=> resolve('enough sleep') , ms)
+    })
+}
+
 module.exports = {
     formatJson,
-    json2Xml
+    json2Xml,
+    sleep
 }
