@@ -5,7 +5,9 @@ const Wechat = require('./wechat')
 const Weather = require('./weather')
 const path = require('path')
 const replyMessage = require('./../config/replyMessage')
-let mysql = require('./../db/mysql')
+const DataBase = require('./database')
+
+// let mysql = require('./../db/mysql')
 
 const mediaPath = {
     image:path.join(__dirname,'..','static','test','image.jpg'),
@@ -14,9 +16,11 @@ const mediaPath = {
 
 let wechatApi = new Wechat(config)
 let weather = new Weather()
+let dbApi = new DataBase()
 
 let reply = async function(ctx,message){
-    let data = {}
+    let data = {},
+        dbResponse = {} // 数据库权限响应
     data.fromUserName = message.ToUserName
     data.toUserName = message.FromUserName
     data.now = new Date().getTime()
@@ -37,21 +41,22 @@ let reply = async function(ctx,message){
             data.content = `您点击了菜单中的链接`
         }
     } else if (message.MsgType==='text'){
-        let res ='',
-            errCode = ''
-        switch(message.Content) {
-            case '0':
-                data.content = replyMessage['0']
-                break
-            case '1':
-                data.msgType = 'news'
-                data.content = replyMessage['1']
-                break
-            case '数据库':
-                data.content = await wechatApi.sqlTest(mysql.db)
-                break
-            default:
+        let msgContent = message.Content.trim()
+        msgContent = msgContent ? msgContent : ''
+        if(msgContent === '帮助'|| msgContent === 'help') {
+            data.content = replyMessage.help
+        } else if (msgContent === '作者' || msgContent === 'author'){
+            data.content = replyMessage.author
+        } else {
+            dbResponse = await dbApi.checkTimes(message.FromUserName,'chat')
+            if(dbResponse.status === 0){
                 data.content = await wechatApi.chat(message.Content)
+                dbApi.updateTimes(message.FromUserName,'chat')
+            }else if (dbResponse.status === 1){
+                data.content = '不好意思，考虑到服务器压力。您今天的智能聊天次数已达上限。\n更多请回复:\'帮助\'或\'help\''
+            } else {
+                data.content = '不好意思，服务器压力过大，请稍后再试'
+            }
         }
     } else if (message.MsgType === 'voice') {
         data.content = await wechatApi.chat(message.Recognition)
@@ -59,7 +64,15 @@ let reply = async function(ctx,message){
         let label = message.Label,
             locX = message.Location_X,
             locY = message.Location_Y
-        data.content = '地理位置 ' + label + '\n' + await weather.fetchNow(locY + ',' + locX)
+        dbResponse = await dbApi.checkTimes(message.FromUserName,'weather')
+        if(dbResponse.status === 0){
+            data.content = '地理位置 ' + label + '\n' + await weather.fetchNow(locY + ',' + locX)
+            dbApi.updateTimes(message.FromUserName,'weather')
+        } else if (dbResponse.status=== 1){
+            data.content = '不好意思，考虑到服务器压力。您今天的天气查询次数已达上限。\n更多请回复:\'帮助\'或\'help\''
+        } else {
+            data.content = '不好意思，服务器压力过大，请稍后再试'
+        }
     }
     ctx.response.status = 200
     ctx.response.body = json2Xml(data)
