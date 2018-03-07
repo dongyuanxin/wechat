@@ -13,7 +13,8 @@ const api = {
     accessToken:prefix + 'token?grant_type=client_credential',
     chat:'http://api.qingyunke.com/api.php?key=free&appid=0'
 }
-const faceRe = /\{face.*?\}/gs // 过滤掉 青云客 平台的表情符号
+const faceRe = /\{face.*?\}/g // 过滤掉 青云客 平台的表情符号
+// const faceRe = /\{face.*?\}/gs //node 9.5 可以
 
 function Wechat(config) {
     this.appID = config.appID
@@ -113,15 +114,4 @@ Wechat.prototype.chat = function(msg){
     })
 }
 
-Wechat.prototype.sqlTest = function(db){
-    var  sql = 'SELECT * FROM godbmw ';
-    return new Promise((resolve,reject)=>{
-        db.query(sql,function (err, result) {
-            if(err) reject('查看错误')
-            console.log(result);
-            console.log(result[0].Id)
-            resolve(result)
-        });  
-    })
-}
 module.exports = Wechat 
