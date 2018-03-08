@@ -4,7 +4,9 @@ let config = require('./../config/database').mysql
 
 function handleError (err) {
     if (err) {
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') connect() // 断开连接
+        if (err.code === 'PROTOCOL_CONNECTION_LOST' ||  err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR' || err.code === 'ETIMEDOUT') {
+            connect() // 断开连接
+        }
         else console.error('MySQL CONNECTION ERROR\n' + err.stack || err)
     }
 }
