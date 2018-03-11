@@ -32,7 +32,11 @@ Database.prototype.checkTimes = function(username,tag){ // 检查用户每日的
         that.mysql.query(sql,[username],(err,results)=>{
             // 必须return，因为只是改变Promise 状态
             // 但是依旧会向下执行
-            if(err) return reject({status:2})
+            if(err){
+                console.log('IN wechat Database.js')
+                console.error(err)
+                return reject({status:2})
+            }
             if( results.length ===null || results.length === undefined || results.length === 0 || results.length === '0') { // 如果用户不存在
                 that.createUser(username) // 创建记录
                 return resolve( {status:0} ) 
