@@ -4,15 +4,17 @@ const app = new Koa()
 
 const bodyParser = require('koa-bodyparser') // request的body解析
 const xmlParser = require('koa-xml-body')
-const config = require('./config/wechat')
+const config = require('./config').wechat.base
 
 app.use(xmlParser())
 app.use(bodyParser())
 
-const accessWechat = require('./wechat/access') // 微信middle
+// const accessWechat = require('./wechat/access') // 微信middle
+const accessWechat = require('./server/services/wechat/access') // 微信middle
 app.use(accessWechat)
 
-const index = require('./index') // 注册路由
+// const index = require('./index') // 注册路由
+const index = require('./server/controllers/routes') // 注册路由
 app.use(index())
 
 app.listen(config.port) 
