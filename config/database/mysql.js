@@ -6,6 +6,4 @@ let mysql = {
     password : 'banducloud',
     database : 'bandu_db'
 }
-exports = module.exports = {
-    mysql
-}
+exports = module.exports = mysql

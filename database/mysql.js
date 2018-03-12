@@ -1,6 +1,6 @@
 'use strict'
 const mysql = require('mysql')
-let config = require('./../config/database').mysql
+let config = require('./../config').database.mysql
 
 function handleError (err) {
     if (err) {
@@ -22,11 +22,12 @@ function handleClose(err){
 }
 
 function connect(){
-    let db = mysql.createPool(config)
-    // db.connect(function(err) {
-    //     if(err) console.log('MYSQL CONNECT ERROR ' + err)
-    //     else console.log('MYSQL CONNECT SUCCESS')
-    // })
+    console.log(config)
+    let db = mysql.createConnection(config)
+    db.connect(function(err) {
+        if(err) console.log('MYSQL CONNECT ERROR ' + err)
+        else console.log('MYSQL CONNECT SUCCESS')
+    })
     db.on('error', err => handleError(err))
     db.on('close', err => handleClose(err))
     module.exports.db = db
