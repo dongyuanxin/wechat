@@ -4,13 +4,13 @@
  * status:1 接口次数到达最大
  * status:2 服务器压力过大
  */
-const {query} = require('./../../../database/mysql')
+const {query} = require('./../../database/mysql')
 
-function Database(){
+function Mysql(){
     this.query = query
 }
 
-Database.prototype.createUser =async function(username) { // 为新用户创建记录
+Mysql.prototype.createUser =async function(username) { // 为新用户创建记录
     let sql = `INSERT INTO godbmw SET ?;`
     let post = {
         user_name : username,
@@ -25,7 +25,7 @@ Database.prototype.createUser =async function(username) { // 为新用户创建�
     }
 }
 
-Database.prototype.checkTimes =async function(username,tag){ // 检查用户每日的接口次数是否到达到上限
+Mysql.prototype.checkTimes =async function(username,tag){ // 检查用户每日的接口次数是否到达到上限
     let results = '',sql = 'SELECT * FROM godbmw WHERE user_name=?;'
     try{
         results = await this.query(sql,[username])
@@ -47,7 +47,7 @@ Database.prototype.checkTimes =async function(username,tag){ // 检查用户每�
     }
 }
 
-Database.prototype.updateTimes =async function(username,tag) {
+Mysql.prototype.updateTimes =async function(username,tag) {
     let sql = `UPDATE godbmw SET ${tag}_times = ${tag}_times+1 WHERE user_name = ? ;`
     try{
         await this.query(sql,[username])
@@ -57,7 +57,7 @@ Database.prototype.updateTimes =async function(username,tag) {
 }
 
 // 每日回滚数据库，更新times
-Database.prototype.rollbackTimes =async function(){
+Mysql.prototype.rollbackTimes =async function(){
     let sql = 'UPDATE godbmw SET weather_times=0, chat_times=0;'
     let that = this
     try{
@@ -69,4 +69,4 @@ Database.prototype.rollbackTimes =async function(){
     }
 }
 
-exports = module.exports = Database
+exports = module.exports = Mysql

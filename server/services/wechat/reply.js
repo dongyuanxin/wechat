@@ -1,16 +1,11 @@
 'use strict'
 const {json2Xml} = require('./../../utils/util')
+
 const config = require('./../../../config').wechat.base
 const replyMessage = require('./../../../config').wechat.reply
+
 const Wechat = require('./wechat')
-const Weather = require('./weather')
-const path = require('path')
-const DataBase = require('./database')
-
-
-let wechatApi = new Wechat(config)
-let weather = new Weather()
-let dbApi = new DataBase()
+const wechatApi = new Wechat(config)
 
 let reply = async function(ctx,message){
     let data = {},
@@ -23,8 +18,7 @@ let reply = async function(ctx,message){
         if (message.Event==='subscribe') {
             data.content = replyMessage.help
         } else if (message.Event ==='unsubscribe'){
-            console.log("无情取关")
-            return             
+            return console.log("无情取关")            
         } else if(message.Event === 'LOCATION') {
             data.content = `您的位置(经度:${message.Longitude},纬度:${message.Latitude})`
         } else if(message.Event === 'CLICK') {
@@ -42,36 +36,12 @@ let reply = async function(ctx,message){
         } else if (msgContent === '作者' || msgContent === 'author'){
             data.content = replyMessage.author
         } else {
-            dbResponse = await dbApi.checkTimes(message.FromUserName,'chat')
-            if(dbResponse.status === 0){
-                try{
-                    data.content = await wechatApi.chat(message.Content)
-                    dbApi.updateTimes(message.FromUserName,'chat')
-                } catch(err) { 
-                    console.error(err)
-                    data.content = '不好意思，服务器压力过大，请稍后再试'
-                }
-            }else if (dbResponse.status === 1){
-                data.content = '不好意思，考虑到服务器压力。您今天的智能聊天次数已达上限。\n更多请回复:\'帮助\'或\'help\''
-            } else {
-                data.content = '不好意思，服务器压力过大，请稍后再试'
-            }
+            data.content =await wechatApi.chat(message.FromUserName,message.Content)
         }
     } else if (message.MsgType === 'voice') {
-        data.content = await wechatApi.chat(message.Recognition)
-    } else if(message.MsgType === 'location') {
-        let label = message.Label,
-            locX = message.Location_X,
-            locY = message.Location_Y
-        dbResponse = await dbApi.checkTimes(message.FromUserName,'weather')
-        if(dbResponse.status === 0){
-            data.content = '地理位置 ' + label + '\n' + await weather.fetchNow(locY + ',' + locX)
-            dbApi.updateTimes(message.FromUserName,'weather')
-        } else if (dbResponse.status=== 1){
-            data.content = '不好意思，考虑到服务器压力。您今天的天气查询次数已达上限。\n更多请回复:\'帮助\'或\'help\''
-        } else {
-            data.content = '不好意思，服务器压力过大，请稍后再试'
-        }
+        data.content = await wechatApi.chat(message.FromUserName,message.Recognition)
+    } else if (message.MsgType === 'location') {
+        data.content = await wechatApi.fetchNowWeather(message)
     }
     ctx.response.status = 200
     ctx.response.body = json2Xml(data)
