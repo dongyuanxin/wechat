@@ -31,7 +31,7 @@ function addControllers(router,dir) {
 }
 
 module.exports = function(dir) {
-    let controllersDir = dir || '/routes' // 默认路由文件夹
+    let controllersDir = dir || './../routes' // 默认路由文件夹
     let router = require('koa-router')() // 引入路由
     addControllers(router,controllersDir)
     return router.routes()
