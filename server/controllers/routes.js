@@ -18,14 +18,14 @@ function addMapping(router, mapping) {
 }
 
 function addControllers(router,dir) {
-    let files = fs.readdirSync(__dirname +  dir);
+    let files = fs.readdirSync(dir);
     let jsFiles = files.filter((f) => {
         return f.endsWith('.js'); // 只扫描js文件
     });
 
     for (let f of jsFiles) {
         console.log(`扫描路由配置文件: ${f}...`);
-        let mapping = require(__dirname + dir +'/' + f);
+        let mapping = require( dir +'/' + f);
         addMapping(router, mapping);
     }
 }
