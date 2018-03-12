@@ -6,15 +6,19 @@ const request = require('request')
 const rp = require('request-promise')
 const _ = require('lodash')
 
+const Chat = require('./../plugins/chat')
+const Weather = require('./../plugins/weather')
+const Mysql = require('./../../models/mysql')
+
+const chatApi = new Chat()
+const weatherApi = new Weather()
+const mysqlApi = new Mysql()
 const accessTokenPath = path.join(__dirname,'..','..','..','config','wechat','access_token.txt')
 
 const prefix = 'https://api.weixin.qq.com/cgi-bin/'
 const api = {
-    accessToken:prefix + 'token?grant_type=client_credential',
-    chat:'http://api.qingyunke.com/api.php?key=free&appid=0'
+    accessToken:prefix + 'token?grant_type=client_credential'
 }
-const faceRe = /\{face.*?\}/g // 过滤掉 青云客 平台的表情符号
-// const faceRe = /\{face.*?\}/gs //node 9.5 可以
 
 function Wechat(config) {
     this.appID = config.appID
@@ -97,21 +101,55 @@ Wechat.prototype.fetchAcessToken = function() {
     })
 }
 
-Wechat.prototype.chat = function(msg){
-    let uri = api.chat + `&msg=${encodeURI(msg)}`
-    return new Promise(function(resolve,reject){
-        let options = {
-            uri,
-            method:"GET"
+Wechat.prototype.chat = async function(userName,msg) {
+    let result = '',response = ''
+    try{
+        response = await mysqlApi.checkTimes(userName,'chat')
+    } catch (err) { 
+        console.error(err) 
+        return '不好意思，服务器压力过大，请稍后再试'
+    }
+    if (response.status===0) {
+        try{
+            result = await chatApi.qingYunKe(msg)
+            mysqlApi.updateTimes(userName,'chat')
+            return result
+        } catch(err) {
+            console.error(err)
+            return  '不好意思，服务器压力过大，请稍后再试'
         }
-        rp(options).then(function(body){
-            let res = JSON.parse(body)
-            if(res.result===0) resolve(res.content.replace(faceRe,'') + ' ') // 不能发送空白消息
-            else reject('Error at Wechat.chat')
-        }).catch(function(err){
-            reject("Error at Wechat.chat")
-        })
-    })
+    } else if (response.status === 1) {
+        return '不好意思，考虑到服务器压力。您今天的智能聊天次数已达上限。\n更多请回复:\'帮助\'或\'help\''
+    } else {
+        return '不好意思，服务器压力过大，请稍后再试'
+    }
+}
+
+Wechat.prototype.fetchNowWeather =async function(message){
+    let label = message.Label,
+        locX = message.Location_X,
+        locY = message.Location_Y,
+        response = ''
+    try{
+        response = await mysqlApi.checkTimes(message.FromUserName,'weather')
+    } catch(err) {
+        console.error(err)
+        return '不好意思，服务器压力过大，请稍后再试'
+    }
+    if(response.status === 0){
+        try{
+            let result = '地理位置 ' + label + '\n' + await weatherApi.fetchNow(locY + ',' + locX)
+            mysqlApi.updateTimes(message.FromUserName,'weather')
+            return result
+        } catch(err) {
+            console.error(err)
+            return '不好意思，服务器压力过大，请稍后再试'
+        }
+    } else if (response.status=== 1){
+        return '不好意思，考虑到服务器压力。您今天的天气查询次数已达上限。\n更多请回复:\'帮助\'或\'help\''
+    } else {
+        return '不好意思，服务器压力过大，请稍后再试'
+    }
 }
 
 module.exports = Wechat 

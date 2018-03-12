@@ -65,7 +65,7 @@ Weather.prototype.fetchNow = function(location) {
             let res = this.transNow(body)
             resolve(res)
         }).catch(err=>{
-            reject('查询功能测试中')
+            reject('Error in fetchNow function in weather.js')
         })
     })
 }
