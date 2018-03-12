@@ -6,7 +6,7 @@ const request = require('request')
 const rp = require('request-promise')
 const _ = require('lodash')
 
-const accessTokenPath = path.join(__dirname,'..','config','access_token.txt')
+const accessTokenPath = path.join(__dirname,'..','..','..','config','wechat','access_token.txt')
 
 const prefix = 'https://api.weixin.qq.com/cgi-bin/'
 const api = {

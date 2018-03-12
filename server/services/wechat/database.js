@@ -5,7 +5,7 @@
  * status:2 服务器压力过大
  */
 const db = {
-    mysql: require('./../db/mysql').db
+    mysql: require('./../../../database/mysql').db
 }
 
 function Database(){

@@ -1,18 +1,12 @@
 'use strict'
-const {json2Xml} = require('./../utils/util')
-const config = require('./../config/wechat')
+const {json2Xml} = require('./../../utils/util')
+const config = require('./../../../config').wechat.base
+const replyMessage = require('./../../../config').wechat.reply
 const Wechat = require('./wechat')
 const Weather = require('./weather')
 const path = require('path')
-const replyMessage = require('./../config/replyMessage')
 const DataBase = require('./database')
 
-// let mysql = require('./../db/mysql')
-
-const mediaPath = {
-    image:path.join(__dirname,'..','static','test','image.jpg'),
-    vedio:path.join(__dirname,'..','static','test','video.mp4')
-}
 
 let wechatApi = new Wechat(config)
 let weather = new Weather()
