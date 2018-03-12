@@ -107,9 +107,9 @@ Wechat.prototype.chat = function(msg){
         rp(options).then(function(body){
             let res = JSON.parse(body)
             if(res.result===0) resolve(res.content.replace(faceRe,'') + ' ') // 不能发送空白消息
-            else reject('聊天功能测试中')
+            else reject('Error at Wechat.chat')
         }).catch(function(err){
-            reject("聊天功能测试中")
+            reject("Error at Wechat.chat")
         })
     })
 }

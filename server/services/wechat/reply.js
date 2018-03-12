@@ -44,8 +44,13 @@ let reply = async function(ctx,message){
         } else {
             dbResponse = await dbApi.checkTimes(message.FromUserName,'chat')
             if(dbResponse.status === 0){
-                data.content = await wechatApi.chat(message.Content)
-                dbApi.updateTimes(message.FromUserName,'chat')
+                try{
+                    data.content = await wechatApi.chat(message.Content)
+                    dbApi.updateTimes(message.FromUserName,'chat')
+                } catch(err) { 
+                    console.error(err)
+                    data.content = '不好意思，服务器压力过大，请稍后再试'
+                }
             }else if (dbResponse.status === 1){
                 data.content = '不好意思，考虑到服务器压力。您今天的智能聊天次数已达上限。\n更多请回复:\'帮助\'或\'help\''
             } else {

@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const querystring = require('querystring')
 const fs = require('fs')
 const rp = require('request-promise')
-const config = require('./../../../database/mysql').db
+const config = require('./../../../config').plugins.weather
 
 const api = {
     now:{
