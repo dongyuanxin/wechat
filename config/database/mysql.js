@@ -1,9 +1,9 @@
 'use strict'
 let mysql = {
-    host : '119.29.108.188',
+    host : '',
     port : 3306,
-    user : 'bandu',
-    password : 'banducloud',
-    database : 'bandu_db'
+    user : '',
+    password : '',
+    database : ''
 }
 exports = module.exports = mysql
